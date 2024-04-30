@@ -1,8 +1,8 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { View, Text, StyleSheet, ScrollView, Button, TouchableOpacity, ImageBackground } from 'react-native';
 import axios from 'axios';
 import OrderData from '../jsonData/MenuData';
-import { useNavigation } from '@react-navigation/native';
+import { useFocusEffect, useNavigation } from '@react-navigation/native';
 
 interface AddOns {
   gulabJamoon: number;
@@ -22,8 +22,8 @@ interface Product {
 const CartScreen = () => {
   const [products, setProducts] = useState<Product[]>([]);
   const navigation = useNavigation();
-
-  useEffect(() => {
+useFocusEffect(
+  React.useCallback(() => {
     const backendUrl = 'http://192.168.0.159:5001/api/getAllOrderDetails';
     const fetchProducts = async () => {
       try {
@@ -35,7 +35,8 @@ const CartScreen = () => {
     };
 
     fetchProducts();
-  }, []);
+  }, [])
+)
 
   const aggregateProducts = () => {
     let vegMealQuantity = 0;

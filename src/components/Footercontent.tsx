@@ -22,12 +22,11 @@ const Footercontent: React.FC = () => {
                 </View>
             </View>
             <View style={styles.quickLinksContainer}>
-                <TouchableOpacity style={styles.quickLink} onPress={() => navigation.navigate('FAQ')}><Text>FAQ</Text></TouchableOpacity>
-                <TouchableOpacity style={styles.quickLink} onPress={() => navigation.navigate('Aboutus')}><Text>About Us</Text></TouchableOpacity>
-                <TouchableOpacity style={styles.quickLink} onPress={() => navigation.navigate('Contactus')}><Text>Contact Us</Text></TouchableOpacity>
-                <TouchableOpacity style={styles.quickLink} onPress={() => navigation.navigate('Termsandconditions')}><Text>Terms and Conditions</Text></TouchableOpacity>
-                <TouchableOpacity style={styles.quickLink} onPress={() => navigation.navigate('privacypolicy')}><Text>Privacy Policy</Text></TouchableOpacity>
-                <TouchableOpacity style={styles.quickLink} onPress={() => navigation.navigate('RefundPolicy')}><Text>Cancellation and Refund Policy</Text></TouchableOpacity>
+                <TouchableOpacity style={styles.quickLink} onPress={() => navigation.navigate('About us')}><Text>About Us</Text></TouchableOpacity>
+                <TouchableOpacity style={styles.quickLink} onPress={() => navigation.navigate('Contact us')}><Text>Contact Us</Text></TouchableOpacity>
+                <TouchableOpacity style={styles.quickLink} onPress={() => navigation.navigate('Terms And Conditions')}><Text>Terms and Conditions</Text></TouchableOpacity>
+                <TouchableOpacity style={styles.quickLink} onPress={() => navigation.navigate('Privacy Policy')}><Text>Privacy Policy</Text></TouchableOpacity>
+                <TouchableOpacity style={styles.quickLink} onPress={() => navigation.navigate('Cancellation AND RefundPolicy')}><Text>Cancellation and Refund Policy</Text></TouchableOpacity>
             </View>
             <View style={styles.footerTextContainer}>
                 <Text style={styles.footerText}>© CaterOrange</Text>

@@ -6,6 +6,7 @@ import { StackNavigationProp } from '@react-navigation/stack';
 import { ScrollView } from 'react-native-gesture-handler';
 import RNPickerSelect from 'react-native-picker-select';
 import axios from "axios"
+import InputSpinner from 'react-native-input-spinner';
 
 // Define the types for the navigation and route props
 type ParamsList = {
@@ -135,33 +136,54 @@ const MenuScreen: React.FC<Props> = ({ route, navigation }) => {
 
 
         <Text style={{ fontWeight: 'bold' }}>Meal Quantity</Text>
-        <TextInput
-          style={[styles.input, { textAlign: 'center' }]}
-          onChangeText={(text) => setMealQuantity(text)}
-          value={mealQuantity}
-          keyboardType="numeric"
+        <InputSpinner
+          min={1}
+          step={1}
+          width={150}
+          height={40}
+          colorPress={"green"}
+          skin={'clean'}
+          colorMax={"green"}
+          fontSize={20}
+          value={parseInt(mealQuantity)} // Convert mealQuantity to integer for InputSpinner
+          onChange={(num: number) => setMealQuantity(num.toString())} // Convert number to string and update mealQuantity state
         />
         <Text style={{ fontSize: 30, color: 'brown' }}>Add-ons</Text>
         <Text style={{ fontWeight: 'bold', marginTop: 10 }}>Gulab Jamoon</Text>
-        <TextInput
-          style={[styles.input, { textAlign: 'center' }]}
-          onChangeText={(text) => handleAddOnsChange('gulabJamoon', text)}
-          value={addOns.gulabJamoon}
-          keyboardType="numeric"
+        <InputSpinner
+          step={1}
+          width={150}
+          height={40}
+          colorPress={"green"}
+          skin={'clean'}
+          colorMax={"green"}
+          fontSize={20}
+          value={parseInt(addOns.gulabJamoon)} // Convert add-on value to integer for InputSpinner
+          onChange={(num: number) => handleAddOnsChange('gulabJamoon', num.toString())} // Convert number to string and update add-ons state
         />
         <Text style={{ fontWeight: 'bold' }}>moong Dal Halwa</Text>
-        <TextInput
-          style={[styles.input, { textAlign: 'center' }]}
-          onChangeText={(text) => handleAddOnsChange('moongDalHalwa', text)}
-          value={addOns.moongDalHalwa}
-          keyboardType="numeric"
+        <InputSpinner
+          step={1}
+          width={150}
+          height={40}
+          colorPress={"green"}
+          skin={'clean'}
+          colorMax={"green"}
+          fontSize={20}
+          value={parseInt(addOns.moongDalHalwa)}// Convert add-on value to integer for InputSpinner
+          onChange={(num: number) => handleAddOnsChange('moongDalHalwa', num.toString())} // Convert number to string and update add-ons state
         />
         <Text style={{ fontWeight: 'bold' }}>todays Special Sweet</Text>
-        <TextInput
-          style={[styles.input, { textAlign: 'center' }]}
-          onChangeText={(text) => handleAddOnsChange('todaysSpecialSweet', text)}
-          value={addOns.todaysSpecialSweet}
-          keyboardType="numeric"
+        <InputSpinner
+          step={1}
+          width={150}
+          height={40}
+          colorPress={"green"}
+          skin={'clean'}
+          colorMax={"green"}
+          fontSize={20}
+          value={parseInt(addOns.todaysSpecialSweet)}// Convert add-on value to integer for InputSpinner
+          onChange={(num: number) => handleAddOnsChange('todaysSpecialSweet', num.toString())} // Convert number to string and update add-ons state
         />
 
         {/* <Button style={menuButton} title="Add to Cart" onPress={() => console.log('Add to cart')} /> */}
