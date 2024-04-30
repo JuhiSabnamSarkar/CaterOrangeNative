@@ -1,3 +1,81 @@
+import React from 'react';
+import { SafeAreaView, StyleSheet, StatusBar, Platform } from 'react-native';
+import { Provider as PaperProvider } from 'react-native-paper';
+import { NavigationContainer } from '@react-navigation/native';
+import { createDrawerNavigator } from '@react-navigation/drawer';
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
+import HomeScreen from './src/screens/HomeScreen';
+import CartScreen from './src/screens/CartScreen';
+import MenuScreen from './src/screens/MenuScreen';
+import Signup from './src/screens/SignupScreen';
+import Login from './src/screens/LoginScreen';
+import { AuthProvider, useAuth } from './src/hooks/AuthContext';
+import AboutUsPage from './src/components/Aboutus';
+import CancellationRefundPolicy from './src/components/CancellationRefundPolicy';
+import ContactUs from './src/components/Contactus';
+import PrivacyPolicy from './src/components/PrivacyPolicy';
+import TermsAndConditions from './src/components/TermsAndConditions';
+import Header from './src/components/Header';
+import Footer from './src/components/Footer';
+
+const Drawer = createDrawerNavigator();
+
+const App = () => {
+  return (
+    <AuthProvider>
+      <PaperProvider>
+        <SafeAreaView style={styles.container}>
+          <GestureHandlerRootView style={{ flex: 1 }}>
+            <NavigationContainer>
+              <Header />
+              <DrawerNavigator />
+              <Footer />
+            </NavigationContainer>
+          </GestureHandlerRootView>
+        </SafeAreaView>
+      </PaperProvider>
+    </AuthProvider>
+  );
+};
+
+const DrawerNavigator = () => {
+  const { isLoggedIn } = useAuth();
+
+  return (
+    <Drawer.Navigator initialRouteName="Home" screenOptions={{ headerShown: false }}>
+      <Drawer.Screen name="Home" component={HomeScreen} />
+      {isLoggedIn ? (
+        <>
+          <Drawer.Screen name="Menu" component={MenuScreen} />
+          <Drawer.Screen name="Cart" component={CartScreen} />
+        </>
+      ) : (
+        <>
+          <Drawer.Screen name="Login" component={Login} />
+          <Drawer.Screen name="Signup" component={Signup} />
+        </>
+      )}
+
+      <Drawer.Screen name="About us" component={AboutUsPage} />
+      <Drawer.Screen name="Cancellation AND RefundPolicy" component={CancellationRefundPolicy} />
+      <Drawer.Screen name="Contact us" component={ContactUs} />
+      <Drawer.Screen name="Privacy Policy" component={PrivacyPolicy} />
+      <Drawer.Screen name="Terms And Conditions" component={TermsAndConditions} />
+    </Drawer.Navigator>
+  );
+};
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: '#fff',
+    paddingTop: Platform.OS === 'android' ? StatusBar.currentHeight : 0,
+  },
+});
+
+export default App;
+
+
 // import React from 'react';
 // import { SafeAreaView, StyleSheet, StatusBar, Platform } from 'react-native';
 // import { Provider as PaperProvider } from 'react-native-paper'; // Import PaperProvider
@@ -53,83 +131,3 @@
 //     paddingTop: Platform.OS === 'android' ? StatusBar.currentHeight : 0,  // Ensure padding is added only on Android
 //   },
 // });
-
-
-
-
-
-
-
-
-
-// App.js
-import React from 'react';
-import { SafeAreaView, StyleSheet, StatusBar, Platform } from 'react-native';
-import { Provider as PaperProvider } from 'react-native-paper';
-import Header from './src/components/Header';
-import Footer from './src/components/Footer';
-import HomeScreen from './src/screens/HomeScreen';
-import MenuScreen from './src/screens/MenuScreen';
-import CartScreen from './src/screens/CartScreen';
-import ContactUs from './src/components/Contactus';
-import { NavigationContainer } from '@react-navigation/native';
-import { createDrawerNavigator } from '@react-navigation/drawer';
-import Signup from './src/screens/SignupScreen';
-import Login from './src/screens/LoginScreen';
-import CancellationRefundPolicy from './src/components/CancellationRefundPolicy';
-import PrivacyPolicy from './src/components/PrivacyPolicy';
-import TermsAndConditions from './src/components/TermsAndConditions';
-import AboutUsPage from './src/components/Aboutus';
-import { AuthProvider } from './src/hooks/AuthContext';
-import CustomDrawerContent from './src/contents/customDrawerContent';
-import { GestureHandlerRootView } from 'react-native-gesture-handler';
-import { createStackNavigator } from '@react-navigation/stack';
-
-const Drawer = createDrawerNavigator();
-// const Stack = createStackNavigator()
-
-const App = () => {
-  return (
-    <AuthProvider>
-      <PaperProvider>
-        <SafeAreaView style={styles.container}>
-          <GestureHandlerRootView style={{ flex: 1 }}>
-            <NavigationContainer>
-              <Header />
-              
-              <Drawer.Navigator 
-                initialRouteName="Home" 
-                screenOptions={{ headerShown: false }}
-                drawerContent={(props) => <CustomDrawerContent {...props} />}
-              >
-                <Drawer.Screen name="Login" component={Login} />
-                <Drawer.Screen name="Signup" component={Signup} />
-                <Drawer.Screen name="Home" component={HomeScreen} />
-                {/* <Drawer.Screen name="Menu" component={MenuScreen} /> */}
-                <Drawer.Screen name="Cart" component={CartScreen} />
-                <Drawer.Screen name="Aboutus" component={AboutUsPage} />
-                <Drawer.Screen name="Contactus" component={ContactUs} />
-                <Drawer.Screen name="Termsandconditions" component={TermsAndConditions} />
-                <Drawer.Screen name="privacypolicy" component={PrivacyPolicy} />
-                <Drawer.Screen name="RefundPolicy" component={CancellationRefundPolicy} />
-                {/* Add the Login screen here */}
-                
-              </Drawer.Navigator>
-              <Footer />
-            </NavigationContainer>
-          </GestureHandlerRootView>
-        </SafeAreaView>
-      </PaperProvider>
-    </AuthProvider>
-  );
-};
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    paddingTop: Platform.OS === 'android' ? StatusBar.currentHeight : 0,
-  },
-});
-
-export default App;

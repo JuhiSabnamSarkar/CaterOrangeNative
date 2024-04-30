@@ -57,7 +57,7 @@ const MenuScreen: React.FC<Props> = ({ route, navigation }) => {
     ) {
       try {
         const formData = {
-          selectedItemIndex: 0, 
+          selectedItemIndex: 0,
           mealType,
           mealPlan,
           mealQuantity: parseInt(mealQuantity),
@@ -66,14 +66,14 @@ const MenuScreen: React.FC<Props> = ({ route, navigation }) => {
           itemPrice,
           itemDetails,
         };
-        const response = await axios.post('http://10.0.2.2:5001/api/CreateOrderDetails', formData);
+        const response = await axios.post('http://192.168.0.159:5001/api/CreateOrderDetails', formData);
         console.log('Response:', response.data);
         navigation.navigate('Cart', {
           itemImage: itemImage,
           itemName: itemName,
           itemPrice: itemPrice,
           itemDetails: itemDetails
-        }); 
+        });
       } catch (error) {
         console.error('Error:', error);
         // Handle error
@@ -168,7 +168,7 @@ const MenuScreen: React.FC<Props> = ({ route, navigation }) => {
         <TouchableOpacity style={styles.menuButton} onPress={handleAddToCart}>
           <Text style={styles.buttonText}>Add to Cart</Text>
         </TouchableOpacity>
-          {/* <Button onPress={()=>navigation.navigate('Cart')}>press me</Button> */}
+        {/* <Button onPress={()=>navigation.navigate('Cart')}>press me</Button> */}
       </View>
     </ScrollView>
   );

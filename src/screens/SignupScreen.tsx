@@ -29,7 +29,7 @@ const Signup: React.FC<Props> = ({ navigation }) => {
         }
 
         try {
-            const response = await axios.post('http://10.0.2.2:5001/api/signup', {
+            const response = await axios.post('http://192.168.0.159:5001/api/signup', {
                 email,
                 phoneNumber,
                 password

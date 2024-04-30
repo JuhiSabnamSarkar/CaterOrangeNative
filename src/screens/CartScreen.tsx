@@ -24,7 +24,7 @@ const CartScreen = () => {
   const navigation = useNavigation();
 
   useEffect(() => {
-    const backendUrl = 'http://10.0.2.2:5001/api/getAllOrderDetails';
+    const backendUrl = 'http://192.168.0.159:5001/api/getAllOrderDetails';
     const fetchProducts = async () => {
       try {
         const response = await axios.get(backendUrl);
