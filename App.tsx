@@ -96,7 +96,6 @@ const App = () => {
           <GestureHandlerRootView style={{ flex: 1 }}>
             <NavigationContainer>
               <Header />
-              
               <Drawer.Navigator 
                 initialRouteName="Home" 
                 screenOptions={{ headerShown: false }}
@@ -105,7 +104,7 @@ const App = () => {
                 <Drawer.Screen name="Login" component={Login} />
                 <Drawer.Screen name="Signup" component={Signup} />
                 <Drawer.Screen name="Home" component={HomeScreen} />
-                {/* <Drawer.Screen name="Menu" component={MenuScreen} /> */}
+                <Drawer.Screen name="Menu" component={MenuScreen} />
                 <Drawer.Screen name="Cart" component={CartScreen} />
                 <Drawer.Screen name="Aboutus" component={AboutUsPage} />
                 <Drawer.Screen name="Contactus" component={ContactUs} />
@@ -113,7 +112,6 @@ const App = () => {
                 <Drawer.Screen name="privacypolicy" component={PrivacyPolicy} />
                 <Drawer.Screen name="RefundPolicy" component={CancellationRefundPolicy} />
                 {/* Add the Login screen here */}
-                
               </Drawer.Navigator>
               <Footer />
             </NavigationContainer>

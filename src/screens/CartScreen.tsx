@@ -2,14 +2,14 @@ import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, ScrollView, Button, TouchableOpacity, ImageBackground } from 'react-native';
 import axios from 'axios';
 import OrderData from '../jsonData/MenuData';
-import { useNavigation } from '@react-navigation/native';
+import { useFocusEffect, useNavigation } from '@react-navigation/native';
+import Icon from 'react-native-vector-icons/FontAwesome';
 
 interface AddOns {
   gulabJamoon: number;
   moongDalHalwa: number;
   todaysSpecialSweet: number;
 }
-
 interface Product {
   id: number;
   itemName: string;
@@ -22,21 +22,66 @@ interface Product {
 const CartScreen = () => {
   const [products, setProducts] = useState<Product[]>([]);
   const navigation = useNavigation();
-
-  useEffect(() => {
-    const backendUrl = 'http://10.0.2.2:5001/api/getAllOrderDetails';
-    const fetchProducts = async () => {
-      try {
-        const response = await axios.get(backendUrl);
-        setProducts(response.data);
-      } catch (error) {
-        console.error('Error fetching products:', error);
+  const handleIncrement = () => {
+    products.forEach(item => {
+      if (item.addOns) {
+        item.addOns.gulabJamoon += 1;
       }
-    };
+    });
+    setProducts([...products])
 
-    fetchProducts();
-  }, []);
+  }
+  const handleDecrement = () => {
+    products.forEach(item => {
+      if (item.addOns) {
+        item.addOns.gulabJamoon -= 1;
+      }
+    });
+    setProducts([...products])
+  }
+  const handleIncrementMeal = () => {
+    products.forEach(item => {
+      if (item.mealQuantity) {
+        item.mealQuantity += 1;
+      }
+    });
+    setProducts([...products])
 
+  }
+  const handleDecrementMeal = () => {
+    products.forEach(async(item) => {
+      if (item.mealQuantity) {
+        item.mealQuantity -= 1;
+        if (item.addOns.gulabJamoon === 0) {
+          // Update the database value for gulabJamoon
+          try {
+            await axios.put(`http://10.0.2.2:5001/api/updateOrderDetails/662f9ec820cad9c4eb2886f0`, {
+              addOns: { gulabJamoon: 0 }, 
+            });
+          } catch (error) {
+            console.error('Error updating database:', error);
+          }
+        }
+      }
+    });
+    setProducts([...products])
+  }
+
+  useFocusEffect(
+    React.useCallback(() => {
+      const backendUrl = 'http://10.0.2.2:5001/api/getAllOrderDetails';
+      const fetchProducts = async () => {
+        try {
+          const response = await axios.get(backendUrl);
+          setProducts(response.data);
+        } catch (error) {
+          console.error('Error fetching products:', error);
+        }
+      };
+
+      fetchProducts();
+    }, [])
+  )
   const aggregateProducts = () => {
     let vegMealQuantity = 0;
     let vegMealTotal = 0;
@@ -91,9 +136,9 @@ const CartScreen = () => {
     products.forEach(product => {
       quantities['Veg Meal'] += product.mealQuantity || 0;
       if (product.addOns) {
-        quantities['Gulab Jamoon'] += product.addOns.gulabJamoon;
-        quantities['Moong Dal Halwa'] += product.addOns.moongDalHalwa;
-        quantities['Todays Special Sweet'] += product.addOns.todaysSpecialSweet;
+        quantities['Gulab Jamoon'] += product.addOns.gulabJamoon || 0;
+        quantities['Moong Dal Halwa'] += product.addOns.moongDalHalwa || 0;
+        quantities['Todays Special Sweet'] += product.addOns.todaysSpecialSweet || 0;
       }
     });
 
@@ -101,6 +146,10 @@ const CartScreen = () => {
       const itemPrice = OrderData.find(item => item.itemName === itemName)?.itemPrice || 0;
       subtotal += quantities[itemName] * itemPrice;
     });
+
+    // Object.values(quantities).forEach(item => {
+    //   subtotal += item;
+    // });
 
     const GST = 0.18 * subtotal;
     const total = subtotal + GST;
@@ -112,12 +161,13 @@ const CartScreen = () => {
     };
   };
 
+
   const totals = calculateTotals();
 
   const truncateDescription = (description) => {
     const words = description.split(" ");
     if (words.length > 2) {
-      return words.slice(0, 3).join(" ") + "...";
+      return words.slice(0, 2).join(" ") + "...";
     }
     return description;
   };
@@ -139,13 +189,18 @@ const CartScreen = () => {
         <View style={{ borderWidth: 0.2, }}>
           {vegMealTotal > 0 && vegMealQuantity > 0 && (
             <View style={styles.itemContainer}>
+              {/* <TouchableOpacity><Icon name="close-circle" size={30} color="#900" /></TouchableOpacity> */}
               <View style={styles.itemContainerLeft}>
                 <Text style={styles.itemName}>Veg Meal</Text>
                 <Text>{truncateDescription(vegMealDescription)}</Text>
               </View>
-              <View style={{ flexDirection: 'row', gap: 60 }}>
-                <Text style={{fontWeight: 'bold'}}>₹{vegMealTotal}</Text>
-                <Text style={{fontSize: 20}}>{vegMealQuantity}</Text>
+              <View style={{ flexDirection: 'row', gap: 40 }}>
+                <Text style={{ fontWeight: 'bold' }}>₹{vegMealTotal}</Text>
+                <View style={{ flexDirection: 'row', gap: 15, backgroundColor: '#EE4266',alignItems: 'center', justifyContent: 'center', paddingHorizontal: 10 , borderRadius: 20}}>
+                  <TouchableOpacity onPress={handleIncrementMeal}><Text style={{color: 'white', fontSize: 20}}>+</Text></TouchableOpacity>
+                  <Text style={{ fontSize: 15, color: 'white' }}>{vegMealQuantity}</Text>
+                  <TouchableOpacity onPress={handleDecrementMeal}><Text style={{color: 'white', fontSize: 20}}>-</Text></TouchableOpacity>
+                </View>
               </View>
             </View>
           )}
@@ -155,9 +210,13 @@ const CartScreen = () => {
                 <Text style={styles.itemName} numberOfLines={2} ellipsizeMode="tail">{dessert}</Text>
                 <Text >{truncateDescription(description)}</Text>
               </View>
-              <View style={{ flexDirection: 'row', gap: 60 }}>
-                <Text style={{fontWeight: 'bold'}}>₹{total.toFixed(2)}</Text>
-                <Text style={{fontSize: 20}}>{quantity}</Text>
+              <View style={{ flexDirection: 'row', gap: 40 }}>
+                <Text style={{ fontWeight: 'bold' }}>₹{total.toFixed(2)}</Text>
+                <View style={{ flexDirection: 'row', gap: 15, backgroundColor: '#EE4266',alignItems: 'center', justifyContent: 'center', paddingHorizontal: 10 , borderRadius: 20}}>
+                  <TouchableOpacity onPress={handleIncrement}><Text style={{color: 'white', fontSize: 20}}>+</Text></TouchableOpacity>
+                  <Text style={{ fontSize: 15, color: 'white'}}>{quantity}</Text>
+                  <TouchableOpacity onPress={handleDecrement}><Text style={{color: 'white', fontSize: 20}}>-</Text></TouchableOpacity>
+                </View>
               </View>
             </View>
           ))}
@@ -230,7 +289,7 @@ const styles = StyleSheet.create({
     flexDirection: 'column'
   },
   itemName: {
-    fontSize: 18,
+    fontSize: 15,
     fontWeight: 'bold',
   },
   horizontalRow: {
