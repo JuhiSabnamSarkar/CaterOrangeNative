@@ -50,6 +50,10 @@ const MenuScreen: React.FC<Props> = ({ route, navigation }) => {
 
 
   const handleAddToCart = async () => {
+    if (!mealType || !mealPlan) {
+      alert('Please select meal type and meal plan before adding to cart.');
+      return;
+    }
     if (
       parseInt(mealQuantity) >= 1 &&
       parseInt(addOns.gulabJamoon) >= 0 &&
@@ -67,7 +71,7 @@ const MenuScreen: React.FC<Props> = ({ route, navigation }) => {
           itemPrice,
           itemDetails,
         };
-        const response = await axios.post('http://192.168.0.159:5001/api/CreateOrderDetails', formData);
+        const response = await axios.post('http://10.0.2.2:5001/api/CreateOrderDetails', formData);
         console.log('Response:', response.data);
         navigation.navigate('Cart', {
           itemImage: itemImage,
@@ -107,9 +111,9 @@ const MenuScreen: React.FC<Props> = ({ route, navigation }) => {
           style={pickerSelectStyles}
           onValueChange={(value) => setMealType(value)}
           items={[
-            { label: 'Breakfast', value: 'breakfast' },
+            // { label: 'Breakfast', value: 'breakfast' },
             { label: 'Lunch', value: 'lunch' },
-            { label: 'Dinner', value: 'dinner' },
+            // { label: 'Dinner', value: 'dinner' },
           ]}
           placeholder={{
             label: 'Choose an Option',
@@ -121,11 +125,11 @@ const MenuScreen: React.FC<Props> = ({ route, navigation }) => {
         <Text style={{ fontWeight: 'bold' }}>MEAL PLAN</Text>
         <RNPickerSelect
           style={pickerSelectStyles}
-          onValueChange={(value) => setMealType(value)}
+          onValueChange={(value) => setMealPlan(value)}
           items={[
             { label: 'Single Day', value: 'Single Day' },
-            { label: 'Weekly', value: 'Weekly' },
-            { label: 'Monthly', value: 'Monthly' },
+            // { label: 'Weekly', value: 'Weekly' },
+            // { label: 'Monthly', value: 'Monthly' },
           ]}
           placeholder={{
             label: 'Choose an Option',
@@ -134,63 +138,42 @@ const MenuScreen: React.FC<Props> = ({ route, navigation }) => {
           useNativeAndroidPickerStyle={false}
         />
 
-
-        <Text style={{ fontWeight: 'bold' }}>Meal Quantity</Text>
-        <InputSpinner
-          min={1}
-          step={1}
-          width={150}
-          height={40}
-          colorPress={"green"}
-          skin={'clean'}
-          colorMax={"green"}
-          fontSize={20}
-          value={parseInt(mealQuantity)} // Convert mealQuantity to integer for InputSpinner
-          onChange={(num: number) => setMealQuantity(num.toString())} // Convert number to string and update mealQuantity state
-        />
-        <Text style={{ fontSize: 30, color: 'brown' }}>Add-ons</Text>
-        <Text style={{ fontWeight: 'bold', marginTop: 10 }}>Gulab Jamoon</Text>
-        <InputSpinner
-          step={1}
-          width={150}
-          height={40}
-          colorPress={"green"}
-          skin={'clean'}
-          colorMax={"green"}
-          fontSize={20}
-          value={parseInt(addOns.gulabJamoon)} // Convert add-on value to integer for InputSpinner
-          onChange={(num: number) => handleAddOnsChange('gulabJamoon', num.toString())} // Convert number to string and update add-ons state
-        />
-        <Text style={{ fontWeight: 'bold' }}>moong Dal Halwa</Text>
-        <InputSpinner
-          step={1}
-          width={150}
-          height={40}
-          colorPress={"green"}
-          skin={'clean'}
-          colorMax={"green"}
-          fontSize={20}
-          value={parseInt(addOns.moongDalHalwa)}// Convert add-on value to integer for InputSpinner
-          onChange={(num: number) => handleAddOnsChange('moongDalHalwa', num.toString())} // Convert number to string and update add-ons state
-        />
-        <Text style={{ fontWeight: 'bold' }}>todays Special Sweet</Text>
-        <InputSpinner
-          step={1}
-          width={150}
-          height={40}
-          colorPress={"green"}
-          skin={'clean'}
-          colorMax={"green"}
-          fontSize={20}
-          value={parseInt(addOns.todaysSpecialSweet)}// Convert add-on value to integer for InputSpinner
-          onChange={(num: number) => handleAddOnsChange('todaysSpecialSweet', num.toString())} // Convert number to string and update add-ons state
-        />
-
-        {/* <Button style={menuButton} title="Add to Cart" onPress={() => console.log('Add to cart')} /> */}
+        <View style={{ marginTop: 50, flexDirection: 'column', gap: 20, alignItems: 'center' }}>
+          <View style={{ flexDirection: 'row', gap: 50, alignItems: 'center' }}>
+            <Text style={{ fontWeight: 'bold', fontSize: 20 }}>Meal Quantity</Text>
+            <InputSpinner
+              min={1}
+              step={1}
+              width={100}
+              height={40}
+              colorPress={"green"}
+              skin={'clean'}
+              colorMax={"green"}
+              fontSize={20}
+              value={parseInt(mealQuantity)}
+              onChange={(num: number) => setMealQuantity(num.toString())}
+            />
+          </View>
+          <Text style={{ fontSize: 30, color: 'brown' }}>Add-ons</Text>
+          <View style={{ flexDirection: 'row', gap: 50, alignItems: 'center' }}>
+            <Text style={{ fontWeight: 'bold', fontSize: 20 }}>Gulab Jamoon</Text>
+            <InputSpinner
+              step={1}
+              width={100}
+              height={40}
+              colorPress={"green"}
+              // color= {3E525F}
+              skin={'clean'}
+              colorMax={"green"}
+              fontSize={20}
+              value={parseInt(addOns.gulabJamoon)} // Convert add-on value to integer for InputSpinner
+              onChange={(num: number) => handleAddOnsChange('gulabJamoon', num.toString())} // Convert number to string and update add-ons state
+            />
+          </View>
+        </View>
         <TouchableOpacity style={styles.menuButton} onPress={handleAddToCart}>
           <Text style={styles.buttonText}>Add to Cart</Text>
         </TouchableOpacity>
-        {/* <Button onPress={()=>navigation.navigate('Cart')}>press me</Button> */}
       </View>
     </ScrollView>
   );
@@ -218,7 +201,7 @@ const styles = StyleSheet.create({
     width: 250,
     height: 50,
     alignItems: 'center',
-    marginTop: 20
+    marginTop: 50
   },
   buttonText: {
     color: 'white',
@@ -229,13 +212,14 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
-    padding: 20
+    paddingVertical: 40,
+    paddingHorizontal: 10,
   },
   image: {
     width: 300,
     height: 200,
     borderRadius: 10,
-    marginBottom: 20
+    marginBottom: 40
   },
   name: {
     fontSize: 22,
@@ -263,3 +247,7 @@ const styles = StyleSheet.create({
 });
 
 export default MenuScreen;
+
+
+
+

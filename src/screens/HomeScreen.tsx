@@ -5,6 +5,7 @@ import OrderData from '../jsonData/MenuData';
 import { TouchableOpacity } from 'react-native-gesture-handler';
 import Footercontent from '../components/Footercontent'
 
+
 const HomeScreen = ({ navigation }) => {
   const slideAnim = useRef(new Animated.Value(-200)).current;
 

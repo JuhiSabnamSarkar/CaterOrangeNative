@@ -17,6 +17,7 @@ import PrivacyPolicy from './src/components/PrivacyPolicy';
 import TermsAndConditions from './src/components/TermsAndConditions';
 import Header from './src/components/Header';
 import Footer from './src/components/Footer';
+import Testlogin from './src/components/testlogin';
 
 const Drawer = createDrawerNavigator();
 
@@ -28,6 +29,8 @@ const App = () => {
           <GestureHandlerRootView style={{ flex: 1 }}>
             <NavigationContainer>
               <Header />
+              <Testlogin />
+   
               <DrawerNavigator />
               <Footer />
             </NavigationContainer>
