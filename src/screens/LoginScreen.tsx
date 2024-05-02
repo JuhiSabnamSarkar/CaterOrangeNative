@@ -26,14 +26,12 @@ const Login = ({ navigation }) => {
                 email,
                 password
             });
-           
-            const token = response.data.token;
+           console.log(response);
+            const {token} = response.data;
+            const { _id: id } = response.data.user;
             console.log('Received token:', token);
-            await login(token);
-            // navigation.reset({
-            //     index: 0,
-            //     routes: [{ name: 'Home' }],
-            // });
+            console.log('Received id:', id);
+            await login(token, id);
             navigation.navigate('Home');
             // window.location.reload();
         } catch (error) {

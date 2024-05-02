@@ -7,6 +7,7 @@ import { ScrollView } from 'react-native-gesture-handler';
 import RNPickerSelect from 'react-native-picker-select';
 import axios from "axios"
 import InputSpinner from 'react-native-input-spinner';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 // Define the types for the navigation and route props
 type ParamsList = {
@@ -50,6 +51,7 @@ const MenuScreen: React.FC<Props> = ({ route, navigation }) => {
 
 
   const handleAddToCart = async () => {
+    let userId = await AsyncStorage.getItem('id');
     if (!mealType || !mealPlan) {
       alert('Please select meal type and meal plan before adding to cart.');
       return;
@@ -62,6 +64,7 @@ const MenuScreen: React.FC<Props> = ({ route, navigation }) => {
     ) {
       try {
         const formData = {
+          userId,
           selectedItemIndex: 0,
           mealType,
           mealPlan,

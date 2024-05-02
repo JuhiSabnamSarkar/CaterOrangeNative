@@ -4,6 +4,8 @@ import axios from 'axios';
 import OrderData from '../jsonData/MenuData';
 import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import Icon from 'react-native-vector-icons/FontAwesome';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useAuth } from '../hooks/AuthContext'
 
 interface AddOns {
   gulabJamoon: number;
@@ -22,41 +24,34 @@ interface Product {
 const CartScreen = () => {
   const [products, setProducts] = useState<Product[]>([]);
   const navigation = useNavigation();
+
+
+
+  //For AddOns
   const handleIncrement = () => {
-    products.forEach(item => {
+    products?.map(item => {
       if (item.addOns) {
         item.addOns.gulabJamoon += 1;
+        axios.put(`http://10.0.2.2:5001/api/updateOrderDetails/${item._id}`, {
+          addOns: { gulabJamoon: item.addOns.gulabJamoon }
+        }).catch(error => {
+          console.error('Error updating database:', error);
+          item.addOns.gulabJamoon -= 1;
+        });
       }
+      return item
     });
     setProducts([...products])
 
   }
   const handleDecrement = () => {
-    products.forEach(item => {
+    products?.map(async (item) => {
       if (item.addOns) {
         item.addOns.gulabJamoon -= 1;
-      }
-    });
-    setProducts([...products])
-  }
-  const handleIncrementMeal = () => {
-    products.forEach(item => {
-      if (item.mealQuantity) {
-        item.mealQuantity += 1;
-      }
-    });
-    setProducts([...products])
-
-  }
-  const handleDecrementMeal = () => {
-    products.forEach(async(item) => {
-      if (item.mealQuantity) {
-        item.mealQuantity -= 1;
-        if (item.addOns.gulabJamoon === 0) {
-          // Update the database value for gulabJamoon
+        if (item.addOns.gulabJamoon === 0 || item.addOns.gulabJamoon !== 0) {
           try {
-            await axios.put(`http://10.0.2.2:5001/api/updateOrderDetails/662f9ec820cad9c4eb2886f0`, {
-              addOns: { gulabJamoon: 0 }, 
+            await axios.put(`http://10.0.2.2:5001/api/updateOrderDetails/${item._id}`, {
+              addOns: { gulabJamoon: item.addOns.gulabJamoon },
             });
           } catch (error) {
             console.error('Error updating database:', error);
@@ -67,13 +62,58 @@ const CartScreen = () => {
     setProducts([...products])
   }
 
+
+
+  //For MealQuantity
+  const handleIncrementMeal = () => {
+    products?.map(item => {
+      if (item.mealQuantity) {
+        item.mealQuantity += 1;
+        axios.put(`http://10.0.2.2:5001/api/updateOrderDetails/${item._id}`, {
+          mealQuantity: item.mealQuantity
+        }).catch(error => {
+          console.error('Error updating database:', error);
+          item.mealQuantity -= 1;
+        });
+      }
+      return item
+    });
+    setProducts([...products])
+
+  }
+  const handleDecrementMeal = () => {
+
+    products?.map(async (item) => {
+      if (item.mealQuantity) {
+        item.mealQuantity -= 1;
+        if (item.mealQuantity === 0 || item.mealQuantity !== 0) {
+          try {
+            console.log('item     ', item)
+            await axios.put(`http://10.0.2.2:5001/api/updateOrderDetails/${item._id}`, {
+              mealQuantity: item.mealQuantity,
+            });
+          } catch (error) {
+            console.error('Error updating database:', error);
+          }
+        }
+
+      }
+    });
+    setProducts([...products])
+  }
   useFocusEffect(
     React.useCallback(() => {
-      const backendUrl = 'http://10.0.2.2:5001/api/getAllOrderDetails';
       const fetchProducts = async () => {
+        let id = await AsyncStorage.getItem('id');
+        console.log(id)
+        const backendUrl = `http://10.0.2.2:5001/api/getAllOrderDetails/${id}`;
         try {
           const response = await axios.get(backendUrl);
-          setProducts(response.data);
+
+          // console.log(response)
+          const productsArray = Array.isArray(response.data.data) ? response.data.data : [];
+          console.log(response.data)
+          setProducts(productsArray);
         } catch (error) {
           console.error('Error fetching products:', error);
         }
@@ -92,7 +132,7 @@ const CartScreen = () => {
       'Todays Special Sweet': { quantity: 0, total: 0, description: '' }
     };
 
-    products.forEach(product => {
+    products?.map(product => {
       if (product.mealQuantity) {
         vegMealQuantity += product.mealQuantity;
         vegMealTotal += product.mealQuantity * (OrderData.find(item => item.itemName === 'Veg Meal')?.itemPrice || 0);
@@ -133,7 +173,7 @@ const CartScreen = () => {
       'Todays Special Sweet': 0
     };
 
-    products.forEach(product => {
+    products?.map(product => {
       quantities['Veg Meal'] += product.mealQuantity || 0;
       if (product.addOns) {
         quantities['Gulab Jamoon'] += product.addOns.gulabJamoon || 0;
@@ -172,9 +212,41 @@ const CartScreen = () => {
     return description;
   };
 
-  const handlePayment = () => {
+  const handlePayment = async () => {
+    let userId = await AsyncStorage.getItem('id');
+    console.log('handlepayment')
+    try {
+      // Calculate subtotal, GST, and total
+      const { subtotal, GST, total } = calculateTotals();
+      // Get aggregate data
+      const {
+        vegMealTotal,
+        dessertTotals,
+        vegMealQuantity,
+        vegMealDescription
+      } = aggregateProducts();
 
-  }
+      // Send data to backend for storage
+      // console.log('subtotal :    ',subtotal,'GST : ',GST, 'total :   ', total, 'vegMealTotal :   ', vegMealTotal, 'dessertTotals:  ', dessertTotals, 'vegMealQuantity', vegMealQuantity, 'vegMealDescription', vegMealDescription )
+      const response = await axios.post('http://10.0.2.2:5001/api/createCartDetails', {
+        // cartData,
+        userId,
+        subtotal,
+        GST,
+        total,
+        vegMealTotal,
+        dessertTotals,
+        vegMealQuantity,
+        vegMealDescription
+      });
+      console.log('Checkout successful:', response.data);
+      // Optionally, navigate to a confirmation screen or perform any other actions after successful checkout
+    } catch (error) {
+      console.error('Error during checkout:', error);
+      // Handle error (e.g., display an error message to the user)
+    }
+  };
+
 
   return (
     <ScrollView >
@@ -196,10 +268,10 @@ const CartScreen = () => {
               </View>
               <View style={{ flexDirection: 'row', gap: 40 }}>
                 <Text style={{ fontWeight: 'bold' }}>₹{vegMealTotal}</Text>
-                <View style={{ flexDirection: 'row', gap: 15, backgroundColor: '#EE4266',alignItems: 'center', justifyContent: 'center', paddingHorizontal: 10 , borderRadius: 20}}>
-                  <TouchableOpacity onPress={handleIncrementMeal}><Text style={{color: 'white', fontSize: 20}}>+</Text></TouchableOpacity>
+                <View style={{ flexDirection: 'row', gap: 15, backgroundColor: '#EE4266', alignItems: 'center', justifyContent: 'center', paddingHorizontal: 10, borderRadius: 20 }}>
+                  <TouchableOpacity onPress={handleIncrementMeal}><Text style={{ color: 'white', fontSize: 20 }}>+</Text></TouchableOpacity>
                   <Text style={{ fontSize: 15, color: 'white' }}>{vegMealQuantity}</Text>
-                  <TouchableOpacity onPress={handleDecrementMeal}><Text style={{color: 'white', fontSize: 20}}>-</Text></TouchableOpacity>
+                  <TouchableOpacity onPress={handleDecrementMeal}><Text style={{ color: 'white', fontSize: 20 }}>-</Text></TouchableOpacity>
                 </View>
               </View>
             </View>
@@ -212,10 +284,10 @@ const CartScreen = () => {
               </View>
               <View style={{ flexDirection: 'row', gap: 40 }}>
                 <Text style={{ fontWeight: 'bold' }}>₹{total.toFixed(2)}</Text>
-                <View style={{ flexDirection: 'row', gap: 15, backgroundColor: '#EE4266',alignItems: 'center', justifyContent: 'center', paddingHorizontal: 10 , borderRadius: 20}}>
-                  <TouchableOpacity onPress={handleIncrement}><Text style={{color: 'white', fontSize: 20}}>+</Text></TouchableOpacity>
-                  <Text style={{ fontSize: 15, color: 'white'}}>{quantity}</Text>
-                  <TouchableOpacity onPress={handleDecrement}><Text style={{color: 'white', fontSize: 20}}>-</Text></TouchableOpacity>
+                <View style={{ flexDirection: 'row', gap: 15, backgroundColor: '#EE4266', alignItems: 'center', justifyContent: 'center', paddingHorizontal: 10, borderRadius: 20 }}>
+                  <TouchableOpacity onPress={handleIncrement}><Text style={{ color: 'white', fontSize: 20 }}>+</Text></TouchableOpacity>
+                  <Text style={{ fontSize: 15, color: 'white' }}>{quantity}</Text>
+                  <TouchableOpacity onPress={handleDecrement}><Text style={{ color: 'white', fontSize: 20 }}>-</Text></TouchableOpacity>
                 </View>
               </View>
             </View>
