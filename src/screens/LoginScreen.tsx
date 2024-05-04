@@ -22,18 +22,16 @@ const Login = ({ navigation }) => {
     // ))
     const handleLogin = async () => {
         try {
-           const response = await axios.post('http://192.168.0.159:5001/api/login', {
+           const response = await axios.post(`${process.env.EXPO_PUBLIC_API_URL}:5001/api/login`, {
                 email,
                 password
             });
-           
-            const token = response.data.token;
+           console.log(response);
+            const {token} = response.data;
+            const { _id: id } = response.data.user;
             console.log('Received token:', token);
-            await login(token);
-            // navigation.reset({
-            //     index: 0,
-            //     routes: [{ name: 'Home' }],
-            // });
+            console.log('Received id:', id);
+            await login(token, id);
             navigation.navigate('Home');
             // window.location.reload();
         } catch (error) {

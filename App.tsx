@@ -18,10 +18,25 @@ import TermsAndConditions from './src/components/TermsAndConditions';
 import Header from './src/components/Header';
 import Footer from './src/components/Footer';
 import Testlogin from './src/components/testlogin';
+import { createStackNavigator } from '@react-navigation/stack';
+import UserAdress from './src/components/UserAdress';
 
 const Drawer = createDrawerNavigator();
+// const Stack = createStackNavigator();
+
+// const HomeStack = () => {
+//   return (
+//     <Stack.Navigator>
+//       <Stack.Screen name="Home" component={HomeScreen} />
+//       <Stack.Screen name="Menu" component={MenuScreen} />
+//     </Stack.Navigator>
+//   );
+// };
+
 
 const App = () => {
+  const apiUrl = process.env.EXPO_PUBLIC_API_URL;
+  console.log("env variable",apiUrl);
   return (
     <AuthProvider>
       <PaperProvider>
@@ -29,8 +44,8 @@ const App = () => {
           <GestureHandlerRootView style={{ flex: 1 }}>
             <NavigationContainer>
               <Header />
-              <Testlogin />
-   
+              {/* <Testlogin /> */}
+
               <DrawerNavigator />
               <Footer />
             </NavigationContainer>
@@ -47,9 +62,10 @@ const DrawerNavigator = () => {
   return (
     <Drawer.Navigator initialRouteName="Home" screenOptions={{ headerShown: false }}>
       <Drawer.Screen name="Home" component={HomeScreen} />
+        {/* <Drawer.Screen name="Main" component={HomeStack} options={{ drawerLabel: () => null }} /> */}
       {isLoggedIn ? (
         <>
-          <Drawer.Screen name="Menu" component={MenuScreen} />
+
           <Drawer.Screen name="Cart" component={CartScreen} />
         </>
       ) : (
@@ -58,11 +74,12 @@ const DrawerNavigator = () => {
           <Drawer.Screen name="Signup" component={Signup} />
         </>
       )}
-
+      <Drawer.Screen name="Menu" component={MenuScreen} />
       <Drawer.Screen name="About us" component={AboutUsPage} />
       <Drawer.Screen name="Cancellation AND RefundPolicy" component={CancellationRefundPolicy} />
       <Drawer.Screen name="Contact us" component={ContactUs} />
       <Drawer.Screen name="Privacy Policy" component={PrivacyPolicy} />
+      <Drawer.Screen name="addAdress" component={UserAdress} />
       <Drawer.Screen name="Terms And Conditions" component={TermsAndConditions} />
     </Drawer.Navigator>
   );

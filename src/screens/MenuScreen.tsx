@@ -7,6 +7,7 @@ import { ScrollView } from 'react-native-gesture-handler';
 import RNPickerSelect from 'react-native-picker-select';
 import axios from "axios"
 import InputSpinner from 'react-native-input-spinner';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 // Define the types for the navigation and route props
 type ParamsList = {
@@ -50,6 +51,7 @@ const MenuScreen: React.FC<Props> = ({ route, navigation }) => {
 
 
   const handleAddToCart = async () => {
+    let userId = await AsyncStorage.getItem('id');
     if (!mealType || !mealPlan) {
       alert('Please select meal type and meal plan before adding to cart.');
       return;
@@ -62,6 +64,7 @@ const MenuScreen: React.FC<Props> = ({ route, navigation }) => {
     ) {
       try {
         const formData = {
+          userId,
           selectedItemIndex: 0,
           mealType,
           mealPlan,
@@ -71,7 +74,7 @@ const MenuScreen: React.FC<Props> = ({ route, navigation }) => {
           itemPrice,
           itemDetails,
         };
-        const response = await axios.post('http://10.0.2.2:5001/api/CreateOrderDetails', formData);
+        const response = await axios.post(`${process.env.EXPO_PUBLIC_API_URL}:5001/api/CreateOrderDetails`, formData);
         console.log('Response:', response.data);
         navigation.navigate('Cart', {
           itemImage: itemImage,
@@ -171,6 +174,7 @@ const MenuScreen: React.FC<Props> = ({ route, navigation }) => {
             />
           </View>
         </View>
+      
         <TouchableOpacity style={styles.menuButton} onPress={handleAddToCart}>
           <Text style={styles.buttonText}>Add to Cart</Text>
         </TouchableOpacity>
@@ -247,7 +251,6 @@ const styles = StyleSheet.create({
 });
 
 export default MenuScreen;
-
 
 
 

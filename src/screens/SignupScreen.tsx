@@ -19,7 +19,7 @@ const Signup: React.FC<Props> = ({ navigation }) => {
     const [errorMessage, setErrorMessage] = useState('');
     const [successMessage, setSuccessMessage] = useState('');
     const [showModal, setShowModal] = useState(false);
-
+    
 
     const handleSignup = async () => {
         if (!email || !phoneNumber || !password) {
@@ -29,7 +29,7 @@ const Signup: React.FC<Props> = ({ navigation }) => {
         }
 
         try {
-            const response = await axios.post('http://192.168.0.159:5001/api/signup', {
+            const response = await axios.post(`${process.env.EXPO_PUBLIC_API_URL}:5001/api/signup`, {
                 email,
                 phoneNumber,
                 password
