@@ -19,7 +19,7 @@ import Header from './src/components/Header';
 import Footer from './src/components/Footer';
 import Testlogin from './src/components/testlogin';
 import { createStackNavigator } from '@react-navigation/stack';
-import UserAdress from './src/components/UserAdress';
+import UserAdress from './src/components/AddUserAdress';
 
 const Drawer = createDrawerNavigator();
 // const Stack = createStackNavigator();
@@ -36,7 +36,7 @@ const Drawer = createDrawerNavigator();
 
 const App = () => {
   const apiUrl = process.env.EXPO_PUBLIC_API_URL;
-  console.log("env variable",apiUrl);
+  console.log("env variable", apiUrl);
   return (
     <AuthProvider>
       <PaperProvider>
@@ -62,7 +62,7 @@ const DrawerNavigator = () => {
   return (
     <Drawer.Navigator initialRouteName="Home" screenOptions={{ headerShown: false }}>
       <Drawer.Screen name="Home" component={HomeScreen} />
-        {/* <Drawer.Screen name="Main" component={HomeStack} options={{ drawerLabel: () => null }} /> */}
+      {/* <Drawer.Screen name="Main" component={HomeStack} options={{ drawerLabel: () => null }} /> */}
       {isLoggedIn ? (
         <>
 
@@ -79,7 +79,6 @@ const DrawerNavigator = () => {
       <Drawer.Screen name="Cancellation AND RefundPolicy" component={CancellationRefundPolicy} />
       <Drawer.Screen name="Contact us" component={ContactUs} />
       <Drawer.Screen name="Privacy Policy" component={PrivacyPolicy} />
-      <Drawer.Screen name="addAdress" component={UserAdress} />
       <Drawer.Screen name="Terms And Conditions" component={TermsAndConditions} />
     </Drawer.Navigator>
   );

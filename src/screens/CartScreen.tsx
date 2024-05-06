@@ -6,6 +6,8 @@ import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useAuth } from '../hooks/AuthContext'
+import AddressList from '../components/AdressList';
+import AddUserAddress from '../components/AddUserAdress';
 
 interface AddOns {
   gulabJamoon: number;
@@ -21,11 +23,21 @@ interface Product {
   addOns?: AddOns;
 }
 
+interface Address {
+  street: string;
+  city: string;
+  state: string;
+  pincode: number;
+  landmark: string;
+}
+
 const CartScreen = () => {
   const [products, setProducts] = useState<Product[]>([]);
+  const [Address, setAddress] = useState<Address[]>([]);
+  const [selectedAddressId, setSelectedAddressId] = useState(null);
   const navigation = useNavigation();
 
-
+  console.log(Address, "tets")
 
   //For AddOns
   const handleIncrement = () => {
@@ -101,6 +113,12 @@ const CartScreen = () => {
     });
     setProducts([...products])
   }
+  const handleSelectAddress = (selectedAddress) => {
+    console.log('Selected Address:', selectedAddress);
+    // Your logic to handle the selected address
+  };
+
+
   useFocusEffect(
     React.useCallback(() => {
       const fetchProducts = async () => {
@@ -118,7 +136,17 @@ const CartScreen = () => {
           console.error('Error fetching products:', error);
         }
       };
-
+      const fetchAddresses = async () => {
+        let id = await AsyncStorage.getItem('id');
+        try {
+          const response = await axios.get(`${process.env.EXPO_PUBLIC_API_URL}:5001/api/userAdress/${id}`);
+          console.log(response.data.addresses, "test responce.data.adresses")
+          setAddress(response.data.addresses);
+        } catch (error) {
+          console.error('Error fetching addresses:', error);
+        }
+      };
+      fetchAddresses();
       fetchProducts();
     }, [])
   )
@@ -225,9 +253,22 @@ const CartScreen = () => {
         vegMealQuantity,
         vegMealDescription
       } = aggregateProducts();
+
+      // Send data to backend for storage
+      console.log()
+      const razorpayResponse = await axios.post(`${process.env.EXPO_PUBLIC_API_URL}:5001/api/createRazorPayOrder`, {
+        amount: total,
+        currency: 'INR',
+        receipt: 'razorUser@gmail.com'
+      });
+
+      // Assuming razorpayResponse contains necessary data such as order_id
+      const { order_id, amount, key_id } = razorpayResponse.data;
+
+      console.log('subtotal :    ', subtotal, 'GST : ', GST, 'total :   ', total, 'vegMealTotal :   ', vegMealTotal, 'dessertTotals:  ', dessertTotals, 'vegMealQuantity', vegMealQuantity, 'vegMealDescription', vegMealDescription)
       const response = await axios.post(`${process.env.EXPO_PUBLIC_API_URL}:5001/api/createCartDetails`, {
-        // cartData,
         userId,
+        order_id,
         subtotal,
         GST,
         total,
@@ -243,7 +284,6 @@ const CartScreen = () => {
       // Handle error (e.g., display an error message to the user)
     }
   };
-
 
   // const handlePayment = async () => { 
 
@@ -323,6 +363,12 @@ const CartScreen = () => {
               <Text style={{ fontWeight: 'bold', fontSize: 15 }}>₹{totals.total}</Text>
             </View>
           </View>
+        </View>
+        <View>
+
+          <AddressList addresses={Address} onSelectAddress={handleSelectAddress} />
+          <AddUserAddress />
+
         </View>
         <View style={{ alignItems: 'center', marginTop: 20, justifyContent: 'center' }}>
           <TouchableOpacity style={styles.cartButton} onPress={handlePayment}>

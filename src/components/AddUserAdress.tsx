@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { View, TextInput, Button, Alert, Modal, StyleSheet, Text, TouchableOpacity } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-const UserAddress = () => {
+const AddUserAddress = () => {
   const [street, setStreet] = useState('');
   const [city, setCity] = useState('');
   const [state, setState] = useState('');
@@ -174,4 +174,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default UserAddress;
+export default AddUserAddress;
