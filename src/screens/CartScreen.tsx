@@ -34,7 +34,6 @@ interface Address {
 const CartScreen = () => {
   const [products, setProducts] = useState<Product[]>([]);
   const [Address, setAddress] = useState<Address[]>([]);
-  const [selectedAddressId, setSelectedAddressId] = useState(null);
   const navigation = useNavigation();
 
   console.log(Address, "tets")
@@ -242,6 +241,7 @@ const CartScreen = () => {
 
   const handlePayment = async () => {
     let userId = await AsyncStorage.getItem('id');
+    console.log(userId)
     console.log('handlepayment')
     try {
       // Calculate subtotal, GST, and total

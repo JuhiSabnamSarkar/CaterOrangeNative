@@ -29,9 +29,11 @@ const Login = ({ navigation }) => {
            console.log(response);
             const {token} = response.data;
             const { _id: id } = response.data.user;
+            const { email: useremail } = response.data.user;
+            const { phoneNumber: phoneNumber } = response.data.user;
             console.log('Received token:', token);
             console.log('Received id:', id);
-            await login(token, id);
+            await login(token, id );
             navigation.navigate('Home');
             // window.location.reload();
         } catch (error) {

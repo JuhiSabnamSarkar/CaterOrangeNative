@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { View, TextInput, Button, Alert, Modal, StyleSheet, Text, TouchableOpacity } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useNavigation } from '@react-navigation/native';
 
 const AddUserAddress = () => {
   const [street, setStreet] = useState('');
@@ -9,9 +10,15 @@ const AddUserAddress = () => {
   const [pincode, setPincode] = useState('');
   const [landmark, setLandmark] = useState('');
   const [modalVisible, setModalVisible] = useState(false);
+  const navigation = useNavigation();
 
   const handleSubmit = async () => {
     try {
+      if (!street || !pincode || !landmark) {
+        Alert.alert('Error', 'Please fill in all mandatory fields (Street, Pincode, Landmark)');
+        return;
+      }
+
       let id = await AsyncStorage.getItem('id');
       console.log(id);
       const response = await fetch(`${process.env.EXPO_PUBLIC_API_URL}:5001/api/userAdress/${id}`, {
@@ -27,6 +34,15 @@ const AddUserAddress = () => {
           landmark,
         }),
       });
+
+      Alert.alert('Success', 'Address added successfully');
+      setModalVisible(false); // Close the modal
+      setStreet(''); // Clear the input fields
+      setCity('');
+      setState('');
+      setPincode('');
+      setLandmark('');
+      navigation.navigate('Cart');
 
       if (!response.ok) {
         throw new Error('Failed to add address');
@@ -53,36 +69,55 @@ const AddUserAddress = () => {
         <View style={styles.modalContainer}>
           <View style={styles.modalContent}>
             <Text style={styles.title}>Add New Address</Text>
-            <TextInput
-              style={styles.input}
-              placeholder="Street"
-              value={street}
-              onChangeText={setStreet}
-            />
-            <TextInput
-              style={styles.input}
-              placeholder="City"
-              value={city}
-              onChangeText={setCity}
-            />
-            <TextInput
-              style={styles.input}
-              placeholder="State"
-              value={state}
-              onChangeText={setState}
-            />
-            <TextInput
-              style={styles.input}
-              placeholder="Pincode"
-              value={pincode}
-              onChangeText={setPincode}
-            />
-            <TextInput
-              style={styles.input}
-              placeholder="Landmark"
-              value={landmark}
-              onChangeText={setLandmark}
-            />
+            <View style={styles.inputContainer}>
+
+              <TextInput
+                style={styles.input}
+                placeholder="Enter street"
+                value={street}
+                onChangeText={setStreet}
+              />
+              <Text style={styles.inputLabel}>Street:</Text>
+            </View>
+            <View style={styles.inputContainer}>
+              <TextInput
+                style={styles.input}
+                placeholder="Enter city"
+                value={city}
+                onChangeText={setCity}
+              />
+              <Text style={styles.inputLabel}>City:</Text>
+            </View>
+            <View style={styles.inputContainer}>
+              
+              <TextInput
+                style={styles.input}
+                placeholder="Enter state"
+                value={state}
+                onChangeText={setState}
+              />
+              <Text style={styles.inputLabel}>State:</Text>
+            </View>
+            <View style={styles.inputContainer}>
+
+              <TextInput
+                style={styles.input}
+                placeholder="Enter pincode"
+                value={pincode}
+                onChangeText={setPincode}
+              />
+              <Text style={styles.inputLabel}>Pincode:</Text>
+            </View>
+            <View style={styles.inputContainer}>
+
+              <TextInput
+                style={styles.input}
+                placeholder="Enter landmark"
+                value={landmark}
+                onChangeText={setLandmark}
+              />
+              <Text style={styles.inputLabel}>Landmark:</Text>
+            </View>
             <View style={styles.buttonContainer}>
               <TouchableOpacity style={styles.actionButton} onPress={handleSubmit}>
                 <Text style={styles.actionButtonText}>Add Address</Text>
@@ -170,6 +205,19 @@ const styles = StyleSheet.create({
   cancelButtonText: {
     color: '#000',
     fontSize: 16,
+    fontWeight: 'bold',
+  },
+  inputContainer: {
+    marginBottom: 10,
+    position: 'relative', // Set container to relative positioning
+  },
+  inputLabel: {
+    position: 'absolute', // Position the label absolutely within the container
+    top: -18, // Adjust the top position to bring the label inside the input box line
+    left: 10, // Adjust the left position for desired spacing
+    backgroundColor: '#fff', // Match background color to hide behind the input
+    paddingHorizontal: 5, // Add padding for better appearance
+    fontSize: 12, // Adjust font size if necessary
     fontWeight: 'bold',
   },
 });
